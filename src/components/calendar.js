@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -17,6 +17,33 @@ const Calendar = () => {
   // インスタンスを作成（ページ遷移のため）
   const navigate = useNavigate();
 
+  // バックエンドのbaseurl
+  const WEB_API_URL = 'http://127.0.0.1:5000';
+
+  // /user_create を呼び出す処理
+  const callUserCreateApi = async () => {
+    try {
+      const response = await fetch(`${WEB_API_URL}/get_user`, {
+        method: 'GET'
+      });
+
+      if (!response.ok) {
+        console.error('Request error:', response.status);
+        return;
+      }
+
+      const data = await response.json();
+      console.log('ユーザー情報', data);
+
+    } catch (error) {
+      console.error('Error calling:', error);
+    }
+  };
+
+  useEffect(() => {
+    // データベースの情報取得
+    callUserCreateApi();
+  }, []);
   // カレンダーの日付がクリックされた時の処理
   const handleDateClick = (info) => {
     // クリックされた日付を Plan コンポーネントの状態に設定
