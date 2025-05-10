@@ -9,10 +9,9 @@ import { useNavigate } from 'react-router-dom';
 
 // Calendar コンポーネントの定義
 const Calendar = () => {
-  // usePlanState フックからsetDate関数を取得
+  // usePlanState フックから必要な状態と関数を取得
   const {
     WEB_API_URL,
-    setDate,
     items,
     setItems
   } = usePlanState();
@@ -21,24 +20,25 @@ const Calendar = () => {
   const navigate = useNavigate();
 
   // /get_user を呼び出す処理
-  const callGetUserApi = async () => {
-    try {
-      const response = await fetch(`${WEB_API_URL}/get_user`, {
-        mode: 'cors',
-        method: 'GET'
+  const callGetUserApi = () => {
+    fetch(`${WEB_API_URL}/get_user`, {
+      mode: 'cors',
+      method: 'GET'
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(response)
+        }
+        return response.json(); // レスポンスが OK なら JSON を解析して次の .then に渡す
+      })
+      .then(data => {
+        if (data) {
+          setItems(data); // 取得した data を items state に設定
+        }
+      })
+      .catch(e => {
+        console.error('Error calling:', e);
       });
-
-      if (!response.ok) {
-        console.error('Request error:', response.status);
-        return;
-      }
-
-      const data = await response.json();
-      setItems(data); // 取得した data を items state に設定
-
-    } catch (error) {
-      console.error('Error calling:', error);
-    }
   };
 
   useEffect(() => {
@@ -47,10 +47,8 @@ const Calendar = () => {
   }, []);
   // カレンダーの日付がクリックされた時の処理
   const handleDateClick = (info) => {
-    // クリックされた日付を Plan コンポーネントの状態に設定
-    setDate(info.dateStr);
     // "/plan" ページへ遷移
-    navigate('/plan');
+    navigate(`/plan?date=${info.dateStr}`);
   };
 
   // 予定の配列 (items) を FullCalendar が認識できるイベントオブジェクトの配列に変換
