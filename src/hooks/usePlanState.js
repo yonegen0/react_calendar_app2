@@ -9,6 +9,9 @@ const usePlanState = () => {
   // 日付と内容を合わせたItemのuseState の定義
   const [items, setItems] = useState([]);
 
+  // バックエンドのbaseurl
+  const WEB_API_URL = 'http://127.0.0.1:5000';
+
   // 日付入力フィールドの値が変更を更新
   const handleDateChange = useCallback((e) => {
     setDate(e.target.value);
@@ -34,6 +37,7 @@ const usePlanState = () => {
 
   // カスタムフックが返すオブジェクト
   return {
+    WEB_API_URL, // バックエンドのbaseurl
     date, // 現在の日付 state
     text, // 現在のテキスト state
     items, // 予定のリスト state

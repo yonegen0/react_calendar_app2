@@ -11,19 +11,20 @@ import { useNavigate } from 'react-router-dom';
 const Calendar = () => {
   // usePlanState フックからsetDate関数を取得
   const {
-    setDate
+    WEB_API_URL,
+    setDate,
+    items,
+    setItems
   } = usePlanState();
 
   // インスタンスを作成（ページ遷移のため）
   const navigate = useNavigate();
 
-  // バックエンドのbaseurl
-  const WEB_API_URL = 'http://127.0.0.1:5000';
-
-  // /user_create を呼び出す処理
-  const callUserCreateApi = async () => {
+  // /get_user を呼び出す処理
+  const callGetUserApi = async () => {
     try {
       const response = await fetch(`${WEB_API_URL}/get_user`, {
+        mode: 'cors',
         method: 'GET'
       });
 
@@ -33,7 +34,7 @@ const Calendar = () => {
       }
 
       const data = await response.json();
-      console.log('ユーザー情報', data);
+      setItems(data); // 取得した data を items state に設定
 
     } catch (error) {
       console.error('Error calling:', error);
@@ -42,7 +43,7 @@ const Calendar = () => {
 
   useEffect(() => {
     // データベースの情報取得
-    callUserCreateApi();
+    callGetUserApi();
   }, []);
   // カレンダーの日付がクリックされた時の処理
   const handleDateClick = (info) => {
@@ -51,11 +52,6 @@ const Calendar = () => {
     // "/plan" ページへ遷移
     navigate('/plan');
   };
-
-  // usePlanState フックから items（予定の配列）を取得
-  const {
-    items
-  } = usePlanState();
 
   // 予定の配列 (items) を FullCalendar が認識できるイベントオブジェクトの配列に変換
   const calendarEvents = items.map(item => ({
