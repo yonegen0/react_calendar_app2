@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState,useEffect } from 'react';
 import {
   Container,
   Typography,
@@ -6,7 +6,7 @@ import {
   Button
 } from '@mui/material';
 import usePlanState from '../hooks/usePlanState';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 // Plan コンポーネントの定義
 const Plan = () => {
@@ -14,10 +14,22 @@ const Plan = () => {
   const {
     date, // 選択された日付
     text, // 入力された予定のテキスト
+    setDate,
     handleDateChange, // 日付が変更された時のハンドラー
     handleTextChange, // テキストが変更された時のハンドラー
     handleAddItem: addItemToState, // カスタムフックの handleAddItem 関数を addItemToState という別名で受け取る
   } = usePlanState();
+  const [searchParams] = useSearchParams();
+  const dateFromParams = searchParams.get('date');
+  const [planDate, setPlanDate] = useState(dateFromParams || '');
+
+  useEffect(() => {
+    if (dateFromParams) {
+      setPlanDate(dateFromParams);
+      setDate(planDate)
+    }
+    // ... その他の処理
+  }, [dateFromParams]);
 
   // インスタンスを作成（ページ遷移のため）
   const navigate = useNavigate();

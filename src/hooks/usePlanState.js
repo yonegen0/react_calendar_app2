@@ -6,8 +6,8 @@ const usePlanState = () => {
   const [date, setDate] = useState('');
   // 内容のuseState の定義
   const [text, setText] = useState('');
-  // 日付と内容を合わせたItemのuseState の定義
-  const [items, setItems] = useState([]);
+  // 予定のリストのuseState の定義
+  const [plans, setPlans] = useState([]);
 
   // バックエンドのbaseurl
   const WEB_API_URL = 'http://127.0.0.1:5000';
@@ -22,28 +22,49 @@ const usePlanState = () => {
     setText(e.target.value);
   }, [setText]);
 
+  // /setplan を呼び出す処理
+  const callSetPlanApi = () => {
+    fetch(`${WEB_API_URL}/setplan`, {
+      mode: 'cors',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify([{ date: date, text: text }]),
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(response)
+        }
+        return 
+      })
+      .catch(e => {
+        console.error('Error calling:', e);
+      });
+  };
+
   // 予定を追加する処理
   const handleAddItem = useCallback(() => {
     // date と text の両方に値がある場合にのみ処理を実行
     if (date && text) {
-      // setItems 関数を使用して、items 配列に新しい予定オブジェクトを追加
-      setItems((prevItems) => [...prevItems, { date, text }]);
+      // データベースに登録
+      callSetPlanApi();
       // 空文字列にリセット
       setDate('');
       // 空文字列にリセット
       setText('');
     }
-  }, [date, text, setItems, setDate, setText]);
+  }, [date, text, setDate, setText]);
 
   // カスタムフックが返すオブジェクト
   return {
     WEB_API_URL, // バックエンドのbaseurl
     date, // 現在の日付 state
     text, // 現在のテキスト state
-    items, // 予定のリスト state
+    plans, // 予定のリスト state
     setDate, // date state を更新する関数
     setText, // text state を更新する関数
-    setItems, // items state を更新する関数
+    setPlans, // plans state を更新する関数
     handleDateChange, // 日付変更イベントハンドラー
     handleTextChange, // テキスト変更イベントハンドラー
     handleAddItem, // 予定追加処理関数
