@@ -12,8 +12,8 @@ const Calendar = () => {
   // usePlanState フックから必要な状態と関数を取得
   const {
     WEB_API_URL,
-    items,
-    setItems
+    plans,
+    setPlans
   } = usePlanState();
 
   // インスタンスを作成（ページ遷移のため）
@@ -32,8 +32,15 @@ const Calendar = () => {
         return response.json(); // レスポンスが OK なら JSON を解析して次の .then に渡す
       })
       .then(data => {
-        if (data) {
-          setItems(data); // 取得した data を items state に設定
+        // 予定の配列 (plans) を FullCalendar が認識できるイベントオブジェクトの配列に変換
+        const prev_plans = Object.entries(data).map(([id, plan])=> ({
+          // イベントのタイトルは予定のテキスト
+          title: plan.plan_text,
+          // イベントの開始日は予定の日付
+          start: plan.start_date
+        }));
+        if (prev_plans) {
+          setPlans(prev_plans); // 取得したdataを plans state に設定
         }
       })
       .catch(e => {
@@ -50,14 +57,6 @@ const Calendar = () => {
     // "/plan" ページへ遷移
     navigate(`/plan?date=${info.dateStr}`);
   };
-
-  // 予定の配列 (items) を FullCalendar が認識できるイベントオブジェクトの配列に変換
-  const calendarEvents = items.map(item => ({
-    // イベントのタイトルは予定のテキスト
-    title: item.text,
-    // イベントの開始日は予定の日付
-    start: item.date
-  }));
 
   // Calendar コンポーネントのレンダリング
   return (
@@ -88,7 +87,7 @@ const Calendar = () => {
       // イベントクリック時のイベントハンドラーを設定（アラートでイベントタイトルを表示）
       eventClick={(info) => alert(`イベント: ${info.event.title}`)}
       // カレンダーに表示するイベントデータを設定
-      events={calendarEvents}
+      events={plans}
     />
   );
 };
