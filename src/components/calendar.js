@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -20,7 +20,7 @@ const Calendar = () => {
   const navigate = useNavigate();
 
   // /get_user を呼び出す処理
-  const callGetUserApi = () => {
+  const callGetUserApi = useCallback(async () => {
     fetch(`${WEB_API_URL}/get_user`, {
       mode: 'cors',
       method: 'GET'
@@ -34,6 +34,7 @@ const Calendar = () => {
       .then(data => {
         // 予定の配列 (plans) を FullCalendar が認識できるイベントオブジェクトの配列に変換
         const prev_plans = Object.entries(data).map(([id, plan])=> ({
+          id:id,
           // イベントのタイトルは予定のテキスト
           title: plan.plan_text,
           // イベントの開始日は予定の日付
@@ -46,16 +47,21 @@ const Calendar = () => {
       .catch(e => {
         console.error('Error calling:', e);
       });
-  };
+    }, [WEB_API_URL]);
 
   useEffect(() => {
     // データベースの情報取得
     callGetUserApi();
-  }, []);
+  }, [callGetUserApi]);
   // カレンダーの日付がクリックされた時の処理
   const handleDateClick = (info) => {
     // "/plan" ページへ遷移
-    navigate(`/plan?date=${info.dateStr}`);
+    navigate(`/addplan?date=${info.dateStr}`);
+  };
+  // カレンダーの日付がクリックされた時の処理
+  const handleEventClick = (info) => {
+    // "/plan" ページへ遷移
+    navigate(`/editplan?id=${info.event.id}`);
   };
 
   // Calendar コンポーネントのレンダリング
@@ -85,7 +91,7 @@ const Calendar = () => {
       // 日付クリック時のイベントハンドラーを設定
       dateClick={handleDateClick} // dateClick イベントハンドラーを更新
       // イベントクリック時のイベントハンドラーを設定（アラートでイベントタイトルを表示）
-      eventClick={(info) => alert(`イベント: ${info.event.title}`)}
+      eventClick={handleEventClick}
       // カレンダーに表示するイベントデータを設定
       events={plans}
     />
