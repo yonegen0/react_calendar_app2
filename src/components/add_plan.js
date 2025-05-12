@@ -21,12 +21,10 @@ const Plan = () => {
   } = usePlanState();
   const [searchParams] = useSearchParams();
   const dateFromParams = searchParams.get('date');
-  const [planDate, setPlanDate] = useState(dateFromParams || '');
 
   useEffect(() => {
     if (dateFromParams) {
-      setPlanDate(dateFromParams);
-      setDate(planDate)
+      setDate(dateFromParams)
     }
     // ... その他の処理
   }, [dateFromParams]);
