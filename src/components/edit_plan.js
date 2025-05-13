@@ -19,56 +19,76 @@ const EditPlan = () => {
     setText,
     handleDateChange, // 日付が変更された時のハンドラー
     handleTextChange, // テキストが変更された時のハンドラー
-    handleAddItem: addItemToState, // カスタムフックの handleAddItem 関数を addItemToState という別名で受け取る
   } = usePlanState();
   const [searchParams] = useSearchParams();
   const eventIdFromParams = searchParams.get('id');
 
-    // /getplan を呼び出す処理
-    const callGetPlanApi = useCallback(() => {
-      fetch(`${WEB_API_URL}/getplan`, {
-        mode: 'cors',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify([{ id: eventIdFromParams }]),
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(response)
-        }
-        return response.json(); // レスポンスが OK なら JSON を解析して次の .then に渡す
-      })
-      .then(data => {
-        setDate(data.start_date)
-        setText(data.plan_text)
-      })
-      .catch(e => {
-        console.error('Error calling:', e);
-      });
-    }, [WEB_API_URL]);
+  // /getplan を呼び出す処理
+  const callGetPlanApi = useCallback(() => {
+    fetch(`${WEB_API_URL}/getplan`, {
+      mode: 'cors',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify([{ id: eventIdFromParams }]),
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(response)
+      }
+      return response.json(); // レスポンスが OK なら JSON を解析して次の .then に渡す
+    })
+    .then(data => {
+      setDate(data.start_date)
+      setText(data.plan_text)
+    })
+    .catch(e => {
+      console.error('Error calling:', e);
+    });
+  }, [WEB_API_URL]);
 
-    // /deleteplan を呼び出す処理
-    const callDeletePlanApi = useCallback(async () => {
-      fetch(`${WEB_API_URL}/deleteplan`, {
-        mode: 'cors',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify([{ id: eventIdFromParams }]),
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(response)
-        }
-        return 
-      })
-      .catch(e => {
-        console.error('Error calling:', e);
-      });
-    }, [WEB_API_URL]);
+  // /deleteplan を呼び出す処理
+  const callDeletePlanApi = useCallback( () => {
+    fetch(`${WEB_API_URL}/deleteplan`, {
+      mode: 'cors',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify([{ id: eventIdFromParams }]),
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(response)
+      }
+      return 
+    })
+    .catch(e => {
+      console.error('Error calling:', e);
+    });
+  }, [WEB_API_URL]);
+
+  // /editplan を呼び出す処理
+  const callEditPlanApi = useCallback( () => {
+    fetch(`${WEB_API_URL}/editplan`, {
+      mode: 'cors',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify([{ id: eventIdFromParams, date: date, text: text}]),
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(response)
+      }
+      return 
+    })
+    .catch(e => {
+      console.error('Error calling:', e);
+    });
+  }, [date, text]);
 
   useEffect(() => {
     callGetPlanApi();
@@ -78,9 +98,9 @@ const EditPlan = () => {
   const navigate = useNavigate();
   
   // 「追加」ボタンがクリックされた時の処理
-  const handleAddItem = () => {
-    // まずはカスタムフックの handleAddItem 関数（addItemToState として受け取った関数）を呼び出し、状態を更新
-    addItemToState();
+  const handleEditItem = () => {
+    // 予定修正
+    callEditPlanApi()
     // "/" パス（カレンダー）に遷移
     navigate('/');
   };
@@ -119,7 +139,7 @@ const EditPlan = () => {
         onChange={handleTextChange} // テキストが変更された時のハンドラーを設定
       />
       {/* 修正ボタン */}
-      <Button variant="contained" color="primary" onClick={handleAddItem}>
+      <Button variant="contained" color="primary" onClick={handleEditItem}>
         修正
       </Button>
       {/* 削除ボタン */}
