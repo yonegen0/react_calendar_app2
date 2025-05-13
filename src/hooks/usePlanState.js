@@ -23,7 +23,7 @@ const usePlanState = () => {
   }, [setText]);
 
   // /setplan を呼び出す処理
-  const callSetPlanApi = useCallback(async () => {
+  const callSetPlanApi = useCallback(() => {
     fetch(`${WEB_API_URL}/setplan`, {
       mode: 'cors',
       method: 'POST',
@@ -41,7 +41,7 @@ const usePlanState = () => {
       .catch(e => {
         console.error('Error calling:', e);
       });
-    }, [WEB_API_URL]);
+    }, [date, text]);
 
   // 予定を追加する処理
   const handleAddItem = useCallback(() => {

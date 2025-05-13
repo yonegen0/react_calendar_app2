@@ -20,7 +20,7 @@ const Calendar = () => {
   const navigate = useNavigate();
 
   // /get_user を呼び出す処理
-  const callGetUserApi = useCallback(async () => {
+  const callGetUserApi = useCallback(() => {
     fetch(`${WEB_API_URL}/get_user`, {
       mode: 'cors',
       method: 'GET'

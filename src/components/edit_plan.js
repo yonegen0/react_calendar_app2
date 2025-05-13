@@ -25,7 +25,7 @@ const EditPlan = () => {
   const eventIdFromParams = searchParams.get('id');
 
     // /getplan を呼び出す処理
-    const callGetPlanApi = useCallback(async () => {
+    const callGetPlanApi = useCallback(() => {
       fetch(`${WEB_API_URL}/getplan`, {
         mode: 'cors',
         method: 'POST',
@@ -49,6 +49,27 @@ const EditPlan = () => {
       });
     }, [WEB_API_URL]);
 
+    // /deleteplan を呼び出す処理
+    const callDeletePlanApi = useCallback(async () => {
+      fetch(`${WEB_API_URL}/deleteplan`, {
+        mode: 'cors',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify([{ id: eventIdFromParams }]),
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(response)
+        }
+        return 
+      })
+      .catch(e => {
+        console.error('Error calling:', e);
+      });
+    }, [WEB_API_URL]);
+
   useEffect(() => {
     callGetPlanApi();
   }, [callGetPlanApi]);
@@ -60,6 +81,13 @@ const EditPlan = () => {
   const handleAddItem = () => {
     // まずはカスタムフックの handleAddItem 関数（addItemToState として受け取った関数）を呼び出し、状態を更新
     addItemToState();
+    // "/" パス（カレンダー）に遷移
+    navigate('/');
+  };
+
+  const handleDeleteItem = () => {
+    // データベースから予定を削除
+    callDeletePlanApi();
     // "/" パス（カレンダー）に遷移
     navigate('/');
   };
@@ -95,7 +123,7 @@ const EditPlan = () => {
         修正
       </Button>
       {/* 削除ボタン */}
-      <Button variant="contained" color="error" onClick={handleAddItem}>
+      <Button variant="contained" color="error" onClick={handleDeleteItem}>
         削除
       </Button>
     </Container>
