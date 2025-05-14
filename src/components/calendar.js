@@ -11,9 +11,9 @@ import { useNavigate } from 'react-router-dom';
 const Calendar = () => {
   // usePlanState フックから必要な状態と関数を取得
   const {
-    WEB_API_URL,
-    plans,
-    setPlans
+    WEB_API_URL, // バックエンドのbaseurl
+    plans, // 予定のリスト state
+    setPlans // plans state を更新する関数
   } = usePlanState();
 
   // インスタンスを作成（ページ遷移のため）

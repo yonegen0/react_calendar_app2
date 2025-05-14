@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useEffect } from 'react';
 import {
   Container,
   Typography,
@@ -14,15 +14,18 @@ const AddPlan = () => {
   const {
     date, // 選択された日付
     text, // 入力された予定のテキスト
-    setDate,
+    setDate, // date state を更新する関数
     handleDateChange, // 日付が変更された時のハンドラー
     handleTextChange, // テキストが変更された時のハンドラー
     handleAddItem: addItemToState, // カスタムフックの handleAddItem 関数を addItemToState という別名で受け取る
   } = usePlanState();
+
+  // 遷移時に受け取ったdateを取得
   const [searchParams] = useSearchParams();
   const dateFromParams = searchParams.get('date');
 
   useEffect(() => {
+    // 遷移時に受け取ったdateを設定
     if (dateFromParams) {
       setDate(dateFromParams)
     }
@@ -33,7 +36,7 @@ const AddPlan = () => {
   
   // 「追加」ボタンがクリックされた時の処理
   const handleAddItem = () => {
-    // まずはカスタムフックの handleAddItem 関数（addItemToState として受け取った関数）を呼び出し、状態を更新
+    // 状態を更新
     addItemToState();
     // "/" パス（カレンダー）に遷移
     navigate('/');

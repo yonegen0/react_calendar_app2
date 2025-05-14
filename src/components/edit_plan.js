@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import {
   Container,
   Typography,
@@ -12,18 +12,20 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 const EditPlan = () => {
   // usePlanState フックから必要な状態と関数を取得
   const {
-    WEB_API_URL,
+    WEB_API_URL, // バックエンドのbaseurl
     date, // 選択された日付
     text, // 入力された予定のテキスト
-    setDate,
-    setText,
+    setDate, // date state を更新する関数
+    setText, // text state を更新する関数
     handleDateChange, // 日付が変更された時のハンドラー
     handleTextChange, // テキストが変更された時のハンドラー
   } = usePlanState();
+
+  // 遷移時に受け取ったidを取得
   const [searchParams] = useSearchParams();
   const eventIdFromParams = searchParams.get('id');
 
-  // /getplan を呼び出す処理
+  // 選択した予定取得API呼び出し
   const callGetPlanApi = useCallback(() => {
     fetch(`${WEB_API_URL}/getplan`, {
       mode: 'cors',
@@ -37,7 +39,7 @@ const EditPlan = () => {
       if (!response.ok) {
         throw new Error(response)
       }
-      return response.json(); // レスポンスが OK なら JSON を解析して次の .then に渡す
+      return response.json();
     })
     .then(data => {
       setDate(data.start_date)
@@ -48,7 +50,7 @@ const EditPlan = () => {
     });
   }, [WEB_API_URL]);
 
-  // /deleteplan を呼び出す処理
+  // 予定削除API呼び出し
   const callDeletePlanApi = useCallback( () => {
     fetch(`${WEB_API_URL}/deleteplan`, {
       mode: 'cors',
@@ -69,7 +71,7 @@ const EditPlan = () => {
     });
   }, [WEB_API_URL]);
 
-  // /editplan を呼び出す処理
+  // 予定修正API呼び出し
   const callEditPlanApi = useCallback( () => {
     fetch(`${WEB_API_URL}/editplan`, {
       mode: 'cors',
@@ -91,20 +93,22 @@ const EditPlan = () => {
   }, [date, text]);
 
   useEffect(() => {
+    // 選択した予定取得API呼び出し
     callGetPlanApi();
   }, [callGetPlanApi]);
 
   // インスタンスを作成（ページ遷移のため）
   const navigate = useNavigate();
   
-  // 「追加」ボタンがクリックされた時の処理
+  // 「修正」ボタンがクリックされた時の処理
   const handleEditItem = () => {
-    // 予定修正
+    // データベースの予定修正
     callEditPlanApi()
     // "/" パス（カレンダー）に遷移
     navigate('/');
   };
 
+  // 「削除」ボタンがクリックされた時の処理
   const handleDeleteItem = () => {
     // データベースから予定を削除
     callDeletePlanApi();
